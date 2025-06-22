@@ -1,6 +1,3 @@
-//@ts-check
-
-const { execSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -25,25 +22,25 @@ const CONPTY_SUPPORTED_ARCH = ['x64', 'arm64'];
 console.log('\x1b[32m> Cleaning release folder...\x1b[0m');
 
 function cleanFolderRecursive(folder) {
-  var files = [];
+  let files = [];
   if (fs.existsSync(folder)) {
     files = fs.readdirSync(folder);
-    files.forEach(function(file,index) {
-      var curPath = path.join(folder, file);
-      if (fs.lstatSync(curPath).isDirectory()) { // recurse
-        cleanFolderRecursive(curPath);
-        fs.rmdirSync(curPath);
-      } else if (BUILD_FILES.indexOf(curPath) < 0){ // delete file
-        fs.unlinkSync(curPath);
+    for (let file of files) {
+      let currentPath = path.join(folder, file);
+      if (fs.lstatSync(currentPath).isDirectory()) {
+        cleanFolderRecursive(currentPath);
+        fs.rmdirSync(currentPath);
+      } else if (!BUILD_FILES.includes(currentPath)) {
+        fs.unlinkSync(currentPath);
       }
-    });
+    }
   }
 };
 
 try {
   cleanFolderRecursive(RELEASE_DIR);
-} catch(e) {
-  console.log(e);
+} catch (err) {
+  console.error(err);
   process.exit(1);
 }
 
@@ -76,8 +73,3 @@ if (os.platform() !== 'win32') {
     }
   }
 }
-
-console.log(`\x1b[32m> Generating compile_commands.json...\x1b[0m`);
-execSync('npx node-gyp configure -- -f compile_commands_json');
-
-process.exit(0);
