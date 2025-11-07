@@ -1,9 +1,11 @@
 /**
  * Copyright (c) 2020, Microsoft Corporation (MIT License).
  */
+/// <reference lib="dom" />
 
-import { Worker } from 'worker_threads';
+// import { Worker } from 'worker_threads'; // NOTE: Disabled in favor of Web Workers.
 import { Socket } from 'net';
+import { pathToFileURL } from 'url';
 import { IDisposable } from './types';
 import { IWorkerData, ConoutWorkerMessage, getWorkerPipeName } from './shared/conout';
 import { join } from 'path';
@@ -40,12 +42,15 @@ export class ConoutConnection implements IDisposable {
     private _conoutPipeName: string,
     private _useConptyDll: boolean
   ) {
-    const workerData: IWorkerData = {
-      conoutPipeName: _conoutPipeName
-    };
+    // const workerData: IWorkerData = {
+    //   conoutPipeName: _conoutPipeName
+    // };
     const scriptPath = __dirname.replace('node_modules.asar', 'node_modules.asar.unpacked');
-    this._worker = new Worker(join(scriptPath, 'worker/conoutSocketWorker.js'), { workerData });
-    this._worker.on('message', (message: ConoutWorkerMessage) => {
+    const scriptPathUrl = new URL(pathToFileURL(join(scriptPath, 'worker', 'conoutSocketWorker.js')).href);
+    scriptPathUrl.searchParams.set('conoutPipeName', _conoutPipeName);
+    this._worker = new Worker(scriptPathUrl.toString());
+    this._worker.addEventListener('message', (event) => {
+      let message = event.data as ConoutWorkerMessage;
       switch (message) {
         case ConoutWorkerMessage.READY:
           this._onReady.fire();

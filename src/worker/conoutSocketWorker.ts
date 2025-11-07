@@ -1,13 +1,17 @@
 /**
  * Copyright (c) 2020, Microsoft Corporation (MIT License).
  */
+/// <reference lib="webworker" />
 
-import { parentPort, workerData } from 'worker_threads';
+// import { parentPort, workerData } from 'worker_threads';
 import { Socket, createServer } from 'net';
-import { ConoutWorkerMessage, IWorkerData, getWorkerPipeName } from '../shared/conout';
+import { ConoutWorkerMessage, getWorkerPipeName } from '../shared/conout';
 
-const { conoutPipeName } = (workerData as IWorkerData);
-
+const params = new URLSearchParams(self.location.search);
+const conoutPipeName = params.get('conoutPipeName');
+if (!conoutPipeName) {
+  throw new Error('No pipe name')
+}
 const conoutSocket = new Socket();
 conoutSocket.setEncoding('utf8');
 conoutSocket.connect(conoutPipeName, () => {
@@ -15,8 +19,5 @@ conoutSocket.connect(conoutPipeName, () => {
     conoutSocket.pipe(workerSocket);
   });
   server.listen(getWorkerPipeName(conoutPipeName));
-  if (!parentPort) {
-    throw new Error('worker_threads parentPort is null');
-  }
-  parentPort.postMessage(ConoutWorkerMessage.READY);
+  self.postMessage(ConoutWorkerMessage.READY);
 });
