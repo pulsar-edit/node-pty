@@ -1,4 +1,5 @@
-// @ts-nocheck It doesn't like the references to web workers!
+// @ts-nocheck
+// (It doesn't like the references to web workers!)
 /**
  * Copyright (c) 2020, Microsoft Corporation (MIT License).
  */
