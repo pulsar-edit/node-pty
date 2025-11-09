@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "build": "tsc -b ./src/tsconfig.json && npm run build:fix-worker",
-    "fix-worker": "node ./scripts/fix-worker.js",
+    "build:fix-worker": "node ./scripts/fix-worker.js",
     "watch": "tsc -b -w ./src/tsconfig.json",
     "lint": "eslint -c .eslintrc.js --ext .ts src/",
     "postinstall": "node scripts/post-install.js",
