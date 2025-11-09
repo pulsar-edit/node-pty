@@ -121,6 +121,17 @@ export class WindowsPtyAgent {
     this._conoutSocketWorker = new ConoutConnection(term.conout, this._useConptyDll);
     this._conoutSocketWorker.onReady(() => {
       this._conoutSocketWorker.connectSocket(this._outSocket);
+      if (this._useConpty) {
+        let connect = (this._ptyNative as IConptyNative).connect(
+          this._pty,
+          commandLine,
+          cwd,
+          env,
+          this._useConptyDll,
+          c => this._$onProcessExit(c)
+        );
+        this._innerPid = connect.pid;
+      }
     });
     this._outSocket.on('connect', () => {
       this._outSocket.emit('ready_datapipe');
@@ -133,11 +144,6 @@ export class WindowsPtyAgent {
       writable: true
     });
     this._inSocket.setEncoding('utf8');
-
-    if (this._useConpty) {
-      const connect = (this._ptyNative as IConptyNative).connect(this._pty, commandLine, cwd, env, this._useConptyDll, c => this._$onProcessExit(c));
-      this._innerPid = connect.pid;
-    }
   }
 
   public resize(cols: number, rows: number): void {
