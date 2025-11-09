@@ -3,7 +3,6 @@
 /**
  * Copyright (c) 2020, Microsoft Corporation (MIT License).
  */
-/// <reference lib="dom" />
 
 // import { Worker } from 'worker_threads'; // NOTE: Disabled in favor of Web Workers.
 import { Socket } from 'net';
