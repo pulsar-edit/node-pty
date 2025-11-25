@@ -1,5 +1,5 @@
 {
-  "name": "node-pty",
+  "name": "@pulsar-edit/node-pty",
   "description": "Fork pseudoterminals in Node.JS",
   "author": {
     "name": "Microsoft Corporation"
